@@ -28,7 +28,7 @@ readData <-function(fname){
     data <- read.table(fname, header=TRUE, na.strings='?', sep=';')
     # convert columns to dates
     data$Date <- as.Date(data$Date, format="%d/%m/%Y")
-    data$Timestamp <- strptime(paste(data$Date,data$Time), format="%Y-%m-%d %H%M%S")
+    data$Timestamp <- strptime(paste(data$Date,data$Time), format="%Y-%m-%d %H:%M:%S")
     data
 }
 
@@ -48,21 +48,39 @@ gap <- function(data){
 task2 <- function(data){
     twoDays <- subset(data, Date>=as.Date("2007-02-01")&Date<=as.Date("2007-02-02"))
     png(file='./img/plot2.png')
-    line(twoDays$Global_active_power, twoDays$Timestamp)
+    plot(twoDays$Timestamp, twoDays$Global_active_power, type='l', ylab="Global active power (kilowatt)")
     dev.off()
 }
 
+# Task 3 energy submetering plots
+# Three plots in one
 task3 <- function(data){
     twoDays <- subset(data, Date>=as.Date("2007-02-01")&Date<=as.Date("2007-02-02"))
     png(file='./img/plot3.png')
+    with(twoDays, plot(Timestamp, Sub_metering_1, type='n',ylab="Energy sub metering"))
+    lines(twoDays$Timestamp, twoDays$Sub_metering_2, col="red")
+    lines(twoDays$Timestamp, twoDays$Sub_metering_1)
+    lines(twoDays$Timestamp, twoDays$Sub_metering_3, col="blue")
+    title(ylab="Energy sub metering")
+    legend("topright",legend=c("Sub Metering 1", "Sub metering 2","Sub metering 3"), col=c("black","red","blue"), lty=c(1,1,1))
     dev.off()
 }
 
-# Task 4
+# Task 4 create a chart with four plots, one of them consist of three lines
+# Start with setting the number of rows and columns in the plot by using par(mfrow=c(2,2)
+# Plotting order is by row
 task4 <- function(data){
     twoDays <- subset(data, Date>=as.Date("2007-02-01")&Date<=as.Date("2007-02-02"))
     png(file='./img/plot4.png')
     par(mfrow=c(2,2))
+    with(twoDays, plot(Timestamp, Global_active_power, type='l', ylab="Global active power (kilowatt)"))
+    with(twoDays, plot(Timestamp, Voltage, type='l', xlab="datetime"))
+    with(twoDays, plot(Timestamp, Sub_metering_1, type='n', ylab='Energy sub metering'))
+    with(twoDays, lines(Timestamp, Sub_metering_1, ylab='Energy sub metering'))
+    with(twoDays, lines(Timestamp, Sub_metering_2, col="red", ylab='Energy sub metering'))
+    with(twoDays, lines(Timestamp, Sub_metering_3, col="blue", ylab="Energy sub metering"))
+    legend("topright",legend=c("Sub Metering 1", "Sub metering 2","Sub metering 3"), col=c("black","red","blue"), lty=c(1,1,1))
+    with(twoDays, plot(Timestamp, Global_reactive_power, type='l'))
     dev.off()
 }
 
